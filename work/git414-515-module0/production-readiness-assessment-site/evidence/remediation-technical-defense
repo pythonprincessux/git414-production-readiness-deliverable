@@ -1,0 +1,186 @@
+Production Readiness Audit and Remediation Plan
+
+Published Site URL: https://pythonprincessux.github.io/git414-production-readiness-deliverable/work/git414-515-module0/production-readiness-assessment-site/index.html
+
+1. Audit Findings
+Finding 1
+ID and area: H1 HTML and content structure
+Condition: visit.html | Line 28 | W3C Nu HTML Checker
+Finding: The image does not have an alt attribute.
+Evidence: W3C Nu HTML Checker returned: "One error: map image missing an alt attribute on line 28." The https://html.spec.whatwg.org/dev/images.html states: "The alt attribute must be specified, and its value must not be empty; the value must be an appropriate replacement for the image." Evidence: visit-html-validation.png.
+Impact: People using screen readers cannot tell what the map shows and miss directions to the market.
+
+Priority: High
+
+Next step: Adding an alt attribute to describe what the map is showing.
+
+Finding 2
+ID and area: H2 HTML and content structure
+
+Condition: vendors.html | Lines 45–66 | VS Code inspection
+
+Finding: The vendor checklist table uses  <td> cells for its column labels and does not contain any <th> elements.
+
+Evidence: The code shows column labels as <td> cells instead of <th> cells. Evidence: vendors-table-headers.png. The MDN Web Docs HTML Table Advanced Features and Accessibility guide states: "To make tables accessible, you need to define header cells using the <th> element."
+
+Impact: The screen reader users hear the items in the table without column associations which makes the checklist harder to interpret.
+
+Priority: Medium
+
+Next step: Change the label cells to <th scope="col">.
+
+Finding 3
+ID and area: R1 CSS and responsive behavior
+
+Condition: assets/styles.css | Lines 163–169 | VS Code inspection & Chrome DevTools, Responsive 375 × 812, preview scale 100%
+
+Finding: The media line combines min-width: 980px and max-width: 760px with and, which keeps the responsive styles from applying.
+
+Evidence: Inspection of assets/styles.css lines 163–169 shows @media (min-width: 980px) and (max-width: 760px). Evidence: impossible-media-query.png. In DevTools at 375 × 812, the homepage shows a scaled down desktop layout where the hero is in two columns and the feature cards are in three columns. Evidence: index-mobile-375.png.
+
+Impact: Visitors using a mobile view see a shrunken desktop layout that is hard to navigate and hard to read.
+
+Priority: High
+
+Next step: Change the media line to a single condition that applies at narrow widths or mobile viewports, such as @media (max-width: 760px).
+
+Finding 4
+ID and area: R2 CSS and responsive behavior
+
+Condition: signup.html | Chrome DevTools, Responsive view at 375 × 812, scale 100%
+
+Finding: The form extends past the header and footer width, and the navigation overflows.
+
+Evidence: Chrome DevTools shows .page { width: 1120px; }. Evidence: signup-mobile-375.png.
+
+Impact: During testing, I could see that phone users have to scroll horizontally to see the entire form and complete the signup.
+
+Priority: High
+
+Next step: Replace the fixed width on .page with a responsive rule such as width: 100% and max-width: 1120px.
+
+Finding 5
+ID and area: R3 CSS and responsive behavior
+
+Condition: index.html | Chrome on macOS, 200% browser zoom, DevTools closed
+
+Finding: Paragraph text goes beyond the right edge of the viewport, requiring horizontal scrolling to read the full page.
+
+Evidence: Browser inspection at 200% zoom showed text overflowing past the screen. Evidence: index-zoom-200.png.
+
+Impact: Low-vision users who use zoom to view the page must scroll both horizontally and vertically back and forth to read all of the content.
+
+Priority: High
+
+Next step: Remove fixed container widths so text is readable within the zoom selected, here 200%.
+
+Finding 6
+ID and area: A1 Accessibility
+
+Condition: index.html | Chrome on macOS, 100% zoom, Tab key navigation
+
+Finding: Pressing Tab button showed link destinations in the browser's bottom status area, but no visible outline or highlight like expected.
+
+Evidence: In assets/styles.css on lines 26–28, the stylesheet removes link focus outlines with a:focus { outline: 0; }. Evidence: keyboard-focus-css.png. The W3C WCAG 2.1 Understanding Success Criterion 2.4.7: Focus Visible states: "Any keyboard operable user interface has a mode of operation where the keyboard focus indicator is visible."
+
+Impact: People navigating by keyboard keys cannot see which link is currently active.
+
+Priority: High
+
+Next step: Remove outline: 0; from a:focus and give users a visible focus indicator.
+
+Finding 7
+ID and area: A2 Accessibility
+
+Condition: index.html, element p.eyebrow | Lighthouse in Chrome & DevTools color picker
+
+Finding: Insufficient foreground/background contrast for p.eyebrow, the "Saturday Community Market" label.
+
+Evidence: Lighthouse flagged an insufficient contrast. Evidence: index-lighthouse-contrast.png. Manual measurement in Chrome DevTools color picker gave me a contrast ratio of 4.04:1 for foreground color #c65f3d. Evidence: index-contrast-measurement.png.
+
+Impact: People with low vision will have trouble reading the label.
+
+Priority: Medium
+
+Next step: Change the #c65f3d color to a darker shade that reaches at least 4.5:1 contrast against the background.
+
+Finding 8
+ID and area: D1 Discoverability and metadata
+
+Condition: index.html, lines 3–7 | VS Code inspection
+
+Finding: The homepage head contains a charset declaration, title, and stylesheet link, but no viewport meta tag or description at all.
+
+Evidence: When I directly inspected the code in lines 3–7 in index.html I could see the missing tags. Evidence: index-head-metadata.png. The MDN Web Docs Viewport Meta Tag guide notes that omitting the viewport tag causes mobile browsers to render at a desktop width.
+
+Impact: Mobile browsers treat the layout like a wide desktop screen. No custom page summary to show in the results.
+
+Priority: High
+
+Next step: Add <meta name="viewport" content="width=device-width, initial-scale=1.0"> and a descriptive <meta name="description"> to the head.
+
+Finding 9
+ID and area: D2 Discoverability and metadata
+
+Condition: index.html | W3C Nu HTML Checker
+
+Finding: Missing document language and missing section heading.
+
+Evidence: W3C Nu HTML Checker returned: "Two warnings: missing document language and missing section heading."
+
+Impact: Screen readers cannot see the proper language pronunciation rules, and users navigating by headings would miss sections that are not labeled at all.
+
+Priority: Medium
+
+Next step: Add lang="en" to the <html> element and add a heading to the section that does not have a label.
+
+Finding 10
+ID and area: P1 Performance, compatibility, validation, links, or release quality
+Condition: signup.html | Form submission test via Live Server in Chrome
+Finding: When I submitted the form, I noticed both times the signup page would return with cleared fields and submitted values in the URL query string, with no success confirmation displayed.
+Evidence: Submitting the form reloaded signup.html with empty inputs and names and values to the browser address bar. Source inspection confirmed no explicit action or method attribute and no submission script.
+Impact: Users cannot tell if their registration was received, and submitted information.
+Priority: Medium
+Next step: Add a form action, set method="POST", and add an on-screen confirmation message for submissions to make it more clear for the user/applicant.
+2. Remediation Plan
+First (High Priority)
+Fix the media query (Finding R1): Rewrite the impossible media query on lines 163–169 of assets/styles.css so it would work on mobile devices for .hero, .feature-row, and .vendor-grid take effect.
+Restore focus outlines (Finding A1): Delete a:focus { outline: 0; } in assets/styles.css so keyboard focus indicators are visible.
+Add viewport meta tag (Finding D1): Insert <meta name="viewport" content="width=device-width, initial-scale=1.0"> in the <head> of all HTML pages.
+Fix signup container width (Finding R2): Change .page { width: 1120px; } to a flexible width so the form fits on mobile screens.
+Fix 200% zoom text overflow (Finding R3): Fix containers so paragraph text does not overflowwithout horizontal scrolling.
+Add map alt text (Finding H1): Add an alt attribute to the map image on line 28 of visit.html.
+Next (Medium Priority)
+Add document language and section heading (Finding D2): Add lang="en" to index.html and place a heading in the section that is not labeled at all.
+Add table headers (Finding H2): Change the vendor checklist label cells in vendors.html to <th scope="col">.
+Fix label color contrast (Finding A2): Fix the #c65f3d color on p.eyebrow to meet the 4.5:1 ratio.
+Set up form submission (Finding P1): Set method="POST", add an action, and show a confirmation on signup.html.
+
+Later (Low Priority)
+Add meta descriptions (Finding D1): Write summary descriptions for search engine results across the pages to make it easier for the visitor/user.
+
+3. Technical Defense: Finding A1 (Visible Focus Indicator Removed)
+Condition
+On index.html, pressing Tab in Chrome on macOS at 100% zoom showed link destinations in the browser's bottom status area, but no visible outline or highlight appeared on the focused link.
+
+Evidence
+Inspection of assets/styles.css lines 26–28 shows that link focus outlines are removed with:
+
+CSS
+a:focus {
+  outline: 0;
+}
+
+
+Testing confirmed that pressing Enter opened the linked page, showing that keyboard activation was still working while the visible focus failed. Evidence: keyboard-focus-css.png.
+
+User Impact
+Keyboard only users rely on the visual focus ring to know where they are on the page. 
+Authority
+W3C WCAG 2.1 Understanding Success Criterion 2.4.7: Focus Visible: Requires that "Any keyboard operable user interface has a mode of operation where the keyboard focus indicator is visible."
+MDN Web Docs :focus pseudo-class: States: "Never remove the focus outline without replacing it with an accessible alternative focus style."
+
+Recommended Next Step
+Remove outline: 0; from assets/styles.css and provide a visible outline style for keyboard user, like a gold focus indicator we would typically see when tabbing through the page.
+
+
